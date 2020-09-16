@@ -3,15 +3,9 @@
 
 std::vector<SignatureInfo> ConfigReader::Read(const std::string& filename) {
     auto config = toml::parse(filename);
-    auto targets = toml::find<std::vector<toml::table>>(config, "targets");
     std::vector<SignatureInfo> result = {};
-    for (toml::table& target : targets) {
-        SignatureInfo si;
-        si.module = target["module"].as_string();
-        si.signature = target["signature"].as_string();
-        si.offset = target["offset"].as_integer();
-        si.extra = target["extra"].as_integer();
-        si.name = target["name"].as_string();
+    for (auto& target : config.at("targets").as_array()) {
+        SignatureInfo si(target.at("name").as_string(), target.at("signature").as_string(), target.at("module").as_string(), target.at("offset").as_integer(), target.at("extra").as_integer());
         result.push_back(si);
     }
     return result;
